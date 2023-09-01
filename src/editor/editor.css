@@ -1,0 +1,13 @@
+.editable {
+    border: 1px solid #ccc;
+    padding: 0 8px;
+    width: 750px;
+    height: 500px;
+}
+
+.placeholder {
+    color: #ccc;
+    position: absolute;
+    padding-left: 8px;
+    top: 20px;
+}
