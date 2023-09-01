@@ -8,10 +8,6 @@ export const DocumentPokemonRegex = {
   PUNCTUATION,
 };
 
-export const CapitalizedNamePokemonRegex = new RegExp(
-  "(^|[^#])((?:" + DocumentPokemonRegex.NAME + "{" + 1 + ",})$)"
-);
-
 export const PUNC = DocumentPokemonRegex.PUNCTUATION;
 
 export const TRIGGERS = ["@"].join("");
@@ -42,4 +38,4 @@ export const AtSignPokemonsRegex = new RegExp(
     ")$"
 );
 
-export const SUGGESTION_LIST_LENGTH_LIMIT = 5;
+export const SUGGESTION_LIST_LENGTH_LIMIT = 7;

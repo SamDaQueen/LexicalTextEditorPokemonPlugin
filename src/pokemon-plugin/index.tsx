@@ -13,30 +13,14 @@ import { findPokemonTillCount } from "../services/pokemon-service.tsx";
 import "./index.css";
 import {
   AtSignPokemonsRegex,
-  CapitalizedNamePokemonRegex,
   SUGGESTION_LIST_LENGTH_LIMIT,
 } from "./constants.ts";
 
-function checkForCapitalizedNamePokemons(
-  text: string,
-  minMatchLength: number
-): MenuTextMatch | null {
-  const match = CapitalizedNamePokemonRegex.exec(text);
-  if (match !== null) {
-    const maybeLeadingWhitespace = match[1];
-
-    const matchingString = match[2];
-    if (matchingString != null && matchingString.length >= minMatchLength) {
-      return {
-        leadOffset: match.index + maybeLeadingWhitespace.length,
-        matchingString,
-        replaceableString: matchingString,
-      };
-    }
-  }
-  return null;
-}
-
+/**
+ * Find all the Pokemon names that match the given text.
+ * @param text The text to match.
+ * @param minMatchLength The minimum length of the match.
+ */
 function checkForAtSignPokemons(
   text: string,
   minMatchLength: number
@@ -58,11 +42,11 @@ function checkForAtSignPokemons(
   return null;
 }
 
-function getPossibleQueryMatch(text: string): MenuTextMatch | null {
-  const match = checkForAtSignPokemons(text, 1);
-  return match === null ? checkForCapitalizedNamePokemons(text, 3) : match;
-}
-
+/**
+ * The content of the list item in the typeahead menu.
+ * @param name The name of the Pokemon.
+ * @param url The url of the image of the Pokemon.
+ */
 class PokemonTypeaheadOption extends MenuOption {
   name: string;
   url: string;
@@ -73,6 +57,14 @@ class PokemonTypeaheadOption extends MenuOption {
   }
 }
 
+/**
+ * The typeahead menu item for Pokemon.
+ * @param index The index of the item in the list.
+ * @param isSelected Whether the item is selected.
+ * @param onClick The callback to call when the item is clicked.
+ * @param onMouseEnter The callback to call when the mouse enters the item.
+ * @param option The PokemonTypeaheadOption to render.
+ */
 function PokemonTypeaheadMenuItem({
   index,
   isSelected,
@@ -118,6 +110,7 @@ const PokemonPlugin = (): ReactElement | null => {
     return await findPokemonTillCount(151);
   };
 
+  // Fetch the 151 Pokemon on mount.
   useEffect(() => {
     fetchPokemon().then((response) => {
       console.log("Pokemon fetched");
@@ -214,7 +207,7 @@ const PokemonPlugin = (): ReactElement | null => {
       if (slashMatch !== null) {
         return null;
       }
-      return getPossibleQueryMatch(query);
+      return checkForAtSignPokemons(query, 1);
     },
     [checkForSlashTriggerMatch, editor]
   );
