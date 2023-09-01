@@ -1,0 +1,8 @@
+.pill {
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+    background: rgba(255, 0, 0, 0.4);
+    border-radius: 20px;
+    padding: 2px 8px;
+}

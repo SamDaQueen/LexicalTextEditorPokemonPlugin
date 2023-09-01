@@ -1,20 +1,24 @@
 import axios from "axios";
 
-const POKEMON_API_URL = "https://pokeapi.co/api/v2/pokemon";
+const POKEMON_API_URL: string = "https://pokeapi.co/api/v2/pokemon";
 
-export const findPokemonTillCount = async (
-  count: number
-): Promise<string[]> => {
+/**
+ * Find all pokemon until the count
+ * @param count The number of pokemon to find
+ */
+export const findPokemonTillCount = async (count: number): Promise<[]> => {
   const response = await axios.get(`${POKEMON_API_URL}?limit=${count}`);
-  return response.data.results.map((pokemon: { name: string }) => pokemon.name);
+  for (const pokemon of response.data.results) {
+    pokemon.url = await findImageForPokemon(pokemon.name);
+  }
+  return response.data.results;
 };
 
-export const findPokemonByName = async (name: string): Promise<JSON> => {
+/**
+ * Find the image for a pokemon
+ * @param name The name of the pokemon
+ */
+export const findImageForPokemon = async (name: string): Promise<string> => {
   const response = await axios.get(`${POKEMON_API_URL}/${name}`);
-  return response.data;
-};
-
-export const findPokemonById = async (id: number): Promise<JSON> => {
-  const response = await axios.get(`${POKEMON_API_URL}/${id}`);
-  return response.data;
+  return response.data.sprites.front_default;
 };

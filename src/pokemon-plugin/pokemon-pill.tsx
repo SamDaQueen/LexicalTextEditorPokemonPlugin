@@ -1,8 +1,27 @@
-const PokemonPill = () => {
+import "./pokemon-pill.css";
+import ImageCropper from "./image-cropper.tsx";
+import { ReactElement } from "react";
+
+/**
+ * This component is used to display a pill with a Pokemon's name and image.
+ * @param name The name of the Pokemon
+ * @param url The URL of the Pokemon's image
+ */
+const PokemonPill: ({
+  name,
+  url,
+}: {
+  name: string;
+  url: string;
+}) => ReactElement = ({ name, url }) => {
+  console.log("PokemonPill");
+  console.log(name);
+  console.log(url);
   return (
-    <div>
-      <h1>Pokemon Pill</h1>
-    </div>
+    <span className="pill">
+      <ImageCropper imageUrl={url} />
+      <span>{name}</span>
+    </span>
   );
 };
 

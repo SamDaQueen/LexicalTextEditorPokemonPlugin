@@ -10,54 +10,12 @@ import { $createPokemonNode } from "./pokemon-node.tsx";
 import { TextNode } from "lexical";
 import * as ReactDOM from "react-dom";
 import { findPokemonTillCount } from "../services/pokemon-service.tsx";
-
-const PUNCTUATION =
-  "\\.,\\+\\*\\?\\$\\@\\|#{}\\(\\)\\^\\-\\[\\]\\\\/!%'\"~=<>_:;";
-const NAME = "\\b[A-Z][^\\s" + PUNCTUATION + "]";
-
-const DocumentPokemonRegex = {
-  NAME,
-  PUNCTUATION,
-};
-
-const CapitalizedNamePokemonRegex = new RegExp(
-  "(^|[^#])((?:" + DocumentPokemonRegex.NAME + "{" + 1 + ",})$)"
-);
-
-const PUNC = DocumentPokemonRegex.PUNCTUATION;
-
-const TRIGGERS = ["@"].join("");
-
-const VALID_CHARS = "[^" + TRIGGERS + PUNC + "\\s]";
-
-const VALID_JOINS =
-  "(?:" +
-  " |" + // E.g. " " in "Josh Duck"
-  "[" +
-  PUNC +
-  "]|" + // E.g. "-' in "Salier-Hellendag"
-  ")";
-
-const LENGTH_LIMIT = 75;
-
-const AtSignPokemonsRegex = new RegExp(
-  "(^|\\s|\\()(" +
-    "[" +
-    TRIGGERS +
-    "]" +
-    "((?:" +
-    VALID_CHARS +
-    VALID_JOINS +
-    "){0," +
-    LENGTH_LIMIT +
-    "})" +
-    ")$"
-);
-
-// At most, 5 suggestions are shown in the popup.
-const SUGGESTION_LIST_LENGTH_LIMIT = 5;
-
-const dummyPokemonData = ["bulb", "char", "squirt", "pika"];
+import "./index.css";
+import {
+  AtSignPokemonsRegex,
+  CapitalizedNamePokemonRegex,
+  SUGGESTION_LIST_LENGTH_LIMIT,
+} from "./constants.ts";
 
 function checkForCapitalizedNamePokemons(
   text: string,
@@ -86,8 +44,6 @@ function checkForAtSignPokemons(
   const match = AtSignPokemonsRegex.exec(text);
 
   if (match !== null) {
-    // The strategy ignores leading whitespace but we need to know it's
-    // length to add it to the leadOffset
     const maybeLeadingWhitespace = match[1];
 
     const matchingString = match[3];
@@ -109,11 +65,11 @@ function getPossibleQueryMatch(text: string): MenuTextMatch | null {
 
 class PokemonTypeaheadOption extends MenuOption {
   name: string;
-  picture: ReactElement;
-  constructor(name: string, picture: ReactElement) {
+  url: string;
+  constructor(name: string, url: string) {
     super(name);
     this.name = name;
-    this.picture = picture;
+    this.url = url;
   }
 }
 
@@ -146,32 +102,38 @@ function PokemonTypeaheadMenuItem({
       onMouseEnter={onMouseEnter}
       onClick={onClick}
     >
-      {option.picture}
       <span className="text">{option.name}</span>
     </li>
   );
 }
 
+/**
+ * This plugin provides a typeahead menu for Pokemon names.
+ * It creates a new PokemonNode when a Pokemon is selected.
+ */
 const PokemonPlugin = (): ReactElement | null => {
-  const [pokemonData, setPokemonData] = useState<string[]>(dummyPokemonData);
+  const [pokemonData, setPokemonData] = useState([]);
 
-  const fetchPokemon = async (): Promise<string[]> => {
+  const fetchPokemon = async (): Promise<[]> => {
     return await findPokemonTillCount(151);
   };
 
   useEffect(() => {
     fetchPokemon().then((response) => {
-      console.log("Pokemon fetched", response);
-      console.log(response);
+      console.log("Pokemon fetched");
       setPokemonData(response);
     });
   }, []);
 
   const pokemonLookupService = {
-    search(string: string, callback: (results: Array<string>) => void): void {
+    search(
+      string: string,
+      callback: (results: { name: string; url: string }[]) => void
+    ): void {
       setTimeout(() => {
-        const results = pokemonData.filter((pokemon) =>
-          pokemon.toLowerCase().startsWith(string.toLowerCase())
+        const results: { name: string; url: string }[] = pokemonData.filter(
+          (pokemon: { name: string; url: string }) =>
+            pokemon.name.toLowerCase().startsWith(string.toLowerCase())
         );
         callback(results);
       }, 500);
@@ -181,7 +143,7 @@ const PokemonPlugin = (): ReactElement | null => {
   const pokemonCache = new Map();
 
   function usePokemonLookupService(pokemonString: string | null) {
-    const [results, setResults] = useState<Array<string>>([]);
+    const [results, setResults] = useState<{ name: string; url: string }[]>([]);
 
     useEffect(() => {
       const cachedResults = pokemonCache.get(pokemonString);
@@ -219,11 +181,13 @@ const PokemonPlugin = (): ReactElement | null => {
       closeMenu: () => void
     ): void => {
       editor.update((): void => {
-        const pokemonNode = $createPokemonNode(selectedOption.name);
+        const pokemonNode = $createPokemonNode(
+          selectedOption.name,
+          selectedOption.url
+        );
         if (nodeToReplace) {
           nodeToReplace.replace(pokemonNode);
         }
-        pokemonNode.select();
         closeMenu();
       });
     },
@@ -239,10 +203,7 @@ const PokemonPlugin = (): ReactElement | null => {
   const options = useMemo(
     () =>
       results
-        .map(
-          (result) =>
-            new PokemonTypeaheadOption(result, <i className="icon user" />)
-        )
+        .map((result) => new PokemonTypeaheadOption(result.name, result.url))
         .slice(0, SUGGESTION_LIST_LENGTH_LIMIT),
     [results]
   );
