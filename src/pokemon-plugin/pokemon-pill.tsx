@@ -14,9 +14,6 @@ const PokemonPill: ({
   name: string;
   url: string;
 }) => ReactElement = ({ name, url }) => {
-  console.log("PokemonPill");
-  console.log(name);
-  console.log(url);
   return (
     <span className="pill">
       <ImageCropper imageUrl={url} />

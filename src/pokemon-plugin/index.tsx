@@ -113,7 +113,6 @@ const PokemonPlugin = (): ReactElement | null => {
   // Fetch the 151 Pokemon on mount.
   useEffect(() => {
     fetchPokemon().then((response) => {
-      console.log("Pokemon fetched");
       setPokemonData(response);
     });
   }, []);
