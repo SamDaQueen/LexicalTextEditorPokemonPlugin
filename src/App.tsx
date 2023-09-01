@@ -1,13 +1,10 @@
 import "./App.css";
-import Editor from "./editor/editor.tsx";
+import LexicalEditor from "./index.tsx";
 
 function App() {
   return (
     <div>
-      <h2>Lexical Editor with Pokemon Plugin</h2>
-      <div className="container">
-        <Editor />
-      </div>
+      <LexicalEditor />
     </div>
   );
 }

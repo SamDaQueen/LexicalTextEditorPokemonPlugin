@@ -1,10 +1,10 @@
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import "./editor.css";
+import "./index.css";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import PokemonPlugin from "../pokemon-plugin/pokemon-plugin.tsx";
+import PokemonPlugin from "../pokemon-plugin";
 
 const Editor = () => {
   const onError = (error: Error): void => {
@@ -18,6 +18,7 @@ const Editor = () => {
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
+      <PokemonPlugin />
       <RichTextPlugin
         contentEditable={<ContentEditable className="editable" />}
         placeholder={<div className="placeholder">Enter some text...</div>}
