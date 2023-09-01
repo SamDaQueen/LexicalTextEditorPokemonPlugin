@@ -59,47 +59,6 @@ const SUGGESTION_LIST_LENGTH_LIMIT = 5;
 
 const dummyPokemonData = ["bulb", "char", "squirt", "pika"];
 
-const dummyLookupService = {
-  search(string: string, callback: (results: Array<string>) => void): void {
-    setTimeout(() => {
-      const results = dummyPokemonData.filter((pokemon) =>
-        pokemon.toLowerCase().includes(string.toLowerCase())
-      );
-      callback(results);
-    }, 500);
-  },
-};
-
-const pokemonCache = new Map();
-
-function usePokemonLookupService(pokemonString: string | null) {
-  const [results, setResults] = useState<Array<string>>([]);
-
-  useEffect(() => {
-    const cachedResults = pokemonCache.get(pokemonString);
-
-    if (pokemonString == null) {
-      setResults([]);
-      return;
-    }
-
-    if (cachedResults === null) {
-      return;
-    } else if (cachedResults !== undefined) {
-      setResults(cachedResults);
-      return;
-    }
-
-    pokemonCache.set(pokemonString, null);
-    dummyLookupService.search(pokemonString, (newResults) => {
-      pokemonCache.set(pokemonString, newResults);
-      setResults(newResults);
-    });
-  }, [pokemonString]);
-
-  return results;
-}
-
 function checkForCapitalizedNamePokemons(
   text: string,
   minMatchLength: number
@@ -194,6 +153,61 @@ function PokemonTypeaheadMenuItem({
 }
 
 const PokemonPlugin = (): ReactElement | null => {
+  const [pokemonData, setPokemonData] = useState<string[]>(dummyPokemonData);
+
+  const fetchPokemon = async (): Promise<string[]> => {
+    return await findPokemonTillCount(151);
+  };
+
+  useEffect(() => {
+    fetchPokemon().then((response) => {
+      console.log("Pokemon fetched", response);
+      console.log(response);
+      setPokemonData(response);
+    });
+  }, []);
+
+  const pokemonLookupService = {
+    search(string: string, callback: (results: Array<string>) => void): void {
+      setTimeout(() => {
+        const results = pokemonData.filter((pokemon) =>
+          pokemon.toLowerCase().startsWith(string.toLowerCase())
+        );
+        callback(results);
+      }, 500);
+    },
+  };
+
+  const pokemonCache = new Map();
+
+  function usePokemonLookupService(pokemonString: string | null) {
+    const [results, setResults] = useState<Array<string>>([]);
+
+    useEffect(() => {
+      const cachedResults = pokemonCache.get(pokemonString);
+
+      if (pokemonString == null) {
+        setResults([]);
+        return;
+      }
+
+      if (cachedResults === null) {
+        return;
+      } else if (cachedResults !== undefined) {
+        setResults(cachedResults);
+        return;
+      }
+
+      pokemonCache.set(pokemonString, null);
+      pokemonLookupService.search(pokemonString, (newResults) => {
+        pokemonCache.set(pokemonString, newResults);
+        setResults(newResults);
+      });
+    }, [pokemonString]);
+
+    return results;
+  }
+
   const [editor] = useLexicalComposerContext();
 
   const [query, setQuery] = useState<string | null>(null);

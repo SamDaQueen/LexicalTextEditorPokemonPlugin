@@ -21,7 +21,9 @@ const Editor = () => {
       <PokemonPlugin />
       <RichTextPlugin
         contentEditable={<ContentEditable className="editable" />}
-        placeholder={<div className="placeholder">Enter some text...</div>}
+        placeholder={
+          <div className="placeholder">Use @ to insert Pokémons</div>
+        }
         ErrorBoundary={LexicalErrorBoundary}
       />
       <HistoryPlugin />
