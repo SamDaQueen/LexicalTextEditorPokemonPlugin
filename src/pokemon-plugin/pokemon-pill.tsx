@@ -2,18 +2,22 @@ import "./pokemon-pill.css";
 import ImageCropper from "./image-cropper.tsx";
 import { ReactElement } from "react";
 
+const POKEMON_IMAGE_API_URL: string =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/";
+
 /**
- * This component is used to display a pill with a Pokemon's name and image.
- * @param name The name of the Pokemon
- * @param url The URL of the Pokemon's image
+ * This component is used to display a pill with a Pokémon name and image.
+ * @param name The name of the Pokémon
+ * @param id The id of the Pokémon
  */
 const PokemonPill: ({
   name,
-  url,
+  id,
 }: {
   name: string;
-  url: string;
-}) => ReactElement = ({ name, url }) => {
+  id: number;
+}) => ReactElement = ({ name, id }) => {
+  const url = `${POKEMON_IMAGE_API_URL}/${id}.png`;
   return (
     <span className="pill">
       <ImageCropper imageUrl={url} />

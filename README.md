@@ -1,10 +1,14 @@
 # Pokémon Plugin for the Lexical Text Editor 
 ![pickachu](https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png)
 
-This plugin adds support for fetching Pokémon from a remote API and
+This plugin adds support for fetching all 1281 available Pokémon from a remote API and
 then inserting the Pokémon into the editor as neat little pills.
 
 The project uses React + Vite + TypeScript.
+
+![pikachu](./src/assets/pikachu.png)
+![butterfree](./src/assets/butterfree.png)
+![clefairy](./src/assets/clefairy.png)
 
 ## Installation
 
@@ -16,7 +20,7 @@ The project uses React + Vite + TypeScript.
     - `npm install`
 
 3. Start local server and run tests
-    - `npm run start`
+    - `npm run dev`
     - `npm run test-e2e-chromium` to run only chromium e2e tests
         - The server needs to be running for the e2e tests
 

@@ -45,15 +45,15 @@ function checkForAtSignPokemons(
 /**
  * The content of the list item in the typeahead menu.
  * @param name The name of the Pokemon.
- * @param url The url of the image of the Pokemon.
+ * @param id The id of the Pokemon.
  */
 class PokemonTypeaheadOption extends MenuOption {
   name: string;
-  url: string;
-  constructor(name: string, url: string) {
+  id: number;
+  constructor(name: string, id: number) {
     super(name);
     this.name = name;
-    this.url = url;
+    this.id = id;
   }
 }
 
@@ -100,17 +100,17 @@ function PokemonTypeaheadMenuItem({
 }
 
 /**
- * This plugin provides a typeahead menu for Pokemon names.
- * It creates a new PokemonNode when a Pokemon is selected.
+ * This plugin provides a typeahead menu for Pokémon names.
+ * It creates a new PokemonNode when a Pokémon is selected.
  */
 const PokemonPlugin = (): ReactElement | null => {
   const [pokemonData, setPokemonData] = useState([]);
 
   const fetchPokemon = async (): Promise<[]> => {
-    return await findPokemonTillCount(151);
+    return await findPokemonTillCount(1281);
   };
 
-  // Fetch the 151 Pokemon on mount.
+  // Fetch the 151 Pokémon on mount.
   useEffect(() => {
     fetchPokemon().then((response) => {
       setPokemonData(response);
@@ -120,11 +120,11 @@ const PokemonPlugin = (): ReactElement | null => {
   const pokemonLookupService = {
     search(
       string: string,
-      callback: (results: { name: string; url: string }[]) => void
+      callback: (results: { name: string; id: number }[]) => void
     ): void {
       setTimeout(() => {
-        const results: { name: string; url: string }[] = pokemonData.filter(
-          (pokemon: { name: string; url: string }) =>
+        const results: { name: string; id: number }[] = pokemonData.filter(
+          (pokemon: { name: string; id: number }) =>
             pokemon.name.toLowerCase().startsWith(string.toLowerCase())
         );
         callback(results);
@@ -135,7 +135,7 @@ const PokemonPlugin = (): ReactElement | null => {
   const pokemonCache = new Map();
 
   function usePokemonLookupService(pokemonString: string | null) {
-    const [results, setResults] = useState<{ name: string; url: string }[]>([]);
+    const [results, setResults] = useState<{ name: string; id: number }[]>([]);
 
     useEffect(() => {
       const cachedResults = pokemonCache.get(pokemonString);
@@ -175,7 +175,7 @@ const PokemonPlugin = (): ReactElement | null => {
       editor.update((): void => {
         const pokemonNode = $createPokemonNode(
           selectedOption.name,
-          selectedOption.url
+          selectedOption.id
         );
         if (nodeToReplace) {
           nodeToReplace.replace(pokemonNode);
@@ -195,7 +195,7 @@ const PokemonPlugin = (): ReactElement | null => {
   const options = useMemo(
     () =>
       results
-        .map((result) => new PokemonTypeaheadOption(result.name, result.url))
+        .map((result) => new PokemonTypeaheadOption(result.name, result.id))
         .slice(0, SUGGESTION_LIST_LENGTH_LIMIT),
     [results]
   );
